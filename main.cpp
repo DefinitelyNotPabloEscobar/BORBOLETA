@@ -29,7 +29,6 @@
 
 #include <irrKlang.h>
 
-
 ////////////////////////////////////////////////////////////////////////// SOUND
 
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -170,12 +169,17 @@ glm::lookAt(glm::vec3(-5.0f, -5.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f),
 	glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Orthographic LeftRight(-2,2) BottomTop(-2,2) NearFar(1,10)
-const glm::mat4 ProjectionMatrix1 =
+glm::mat4 ProjectionMatrix1 =
 glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 1.0f, 15.0f);
 
 // Perspective Fovy(30) Aspect(640/480) NearZ(1) FarZ(30)
-const glm::mat4 ProjectionMatrix2 =
+glm::mat4 ProjectionMatrix2 =
 glm::perspective(glm::radians(30.0f), 4.0f / 3.0f, 1.0f, 30.0f);
+
+void updateMatrices(float ratio) {
+	ProjectionMatrix1 = glm::ortho(-2.f * ratio, 2.f * ratio, -2.0f, 2.0f, 1.0f, 15.0f);
+	ProjectionMatrix2 = glm::perspective(glm::radians(30.0f), ratio, 1.0f, 30.0f);
+}
 
 void MyApp::createCamera() {
 
@@ -407,8 +411,16 @@ void MyApp::initCallback(GLFWwindow *win) {
 }
 
 void MyApp::windowSizeCallback(GLFWwindow *win, int winx, int winy) {
+	if (winy == 0) {
+		winy = 1;
+	}
+
   glViewport(0, 0, winx, winy);
   // change projection matrices to maintain aspect ratio
+  float ratio = (float)winx / (float)winy;
+
+  updateMatrices(ratio);
+
 }
 
 void MyApp::displayCallback(GLFWwindow *win, double elapsed) { 
