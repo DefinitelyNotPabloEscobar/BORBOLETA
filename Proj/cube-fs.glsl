@@ -12,7 +12,9 @@ void main(void)
   // vec3 color = vec3(1.0);
   // vec3 color = (exPosition + vec3(1.0)) * 0.5;
   // vec3 color = vec3(exTexcoord, 0.0);
-	vec3 color = (exNormal + vec3(1.0)) * 0.5;
+	//vec3 color = (exNormal + vec3(1.0)) * 0.5;
+	vec3 color = (vec3(exTexcoord, 1.0) + vec3(1.0)) * 0.5;
+	//vec3 color = (vec3(exTexcoord, 0.0)) ;
 	FragmentColor = vec4(color,1.0);
 /** /
 	vec3 N = normalize(exNormal);
