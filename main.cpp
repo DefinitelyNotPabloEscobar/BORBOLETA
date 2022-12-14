@@ -117,7 +117,7 @@ void MyApp::createMeshes() {
   names[3] = "paralelogram.obj";
   names[4] = "purple_triangle.obj";
   names[5] = "red_triangle.obj";
-  names[6] = "cube.obj";
+  names[6] = "green_cube.obj";
 
   for (int i = 0; i < MESH_SIZE; i++) {
 	  mgl::Mesh *Mesh = new mgl::Mesh();
@@ -402,7 +402,7 @@ void MyApp::initCallback(GLFWwindow *win) {
   createMeshes();
   createShaderPrograms(); // after mesh;
   createCamera();
-  SoundEngine->play2D("../assets/surrender.mp3", true);
+  //SoundEngine->play2D("../assets/surrender.mp3", true);
 
 }
 
