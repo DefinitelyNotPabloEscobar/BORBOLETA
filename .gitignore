@@ -339,3 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Intermidiate/Proj.exe.recipe
+/assets/blue_triangle.mtl
+/assets/purple_triangle2.mtl
