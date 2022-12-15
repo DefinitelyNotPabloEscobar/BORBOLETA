@@ -60,6 +60,7 @@ public:
   bool hasTexcoords();
   bool hasTangentsAndBitangents();
   void destroyBufferObjects();
+  void update_position(glm::mat4 M);
 
 private:
   GLuint VaoId;

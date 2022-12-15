@@ -293,6 +293,7 @@ void MyApp :: draw_meshs() {
 	Shaders->bind();
 	glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(ChangingModelMatrix));
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
+		obj->Mesh->update_position(glm::rotate(glm::radians(34.f), glm::vec3(0.f, 1.f, 0.f)));
 		obj->Mesh->draw();
 	}
 	Shaders->unbind();
