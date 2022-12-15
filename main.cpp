@@ -35,6 +35,16 @@ irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
 ////////////////////////////////////////////////////////////////////////// MYAPP
 
+struct Mesh_obj
+{
+	mgl::Mesh* Mesh = nullptr;
+	mgl::ShaderProgram* Shaders = nullptr;
+	Mesh_obj* next_pointer = nullptr;
+	Mesh_obj() : Mesh(nullptr), Shaders(nullptr), next_pointer(nullptr) {};
+
+} Mesh_obj;
+
+
 class MyApp : public mgl::App {
 
 public:
@@ -86,10 +96,10 @@ private:
   mgl::Camera* Camera2 = nullptr;
   GLint ModelMatrixId;
 
-
   static const int MESH_SIZE = 7;
 
-  mgl::Mesh* mesh_list[MESH_SIZE];
+  struct Mesh_obj *Head;
+  struct Mesh_obj *Tail;
 
   void createMeshes();
   void createShaderPrograms();
@@ -116,14 +126,26 @@ void MyApp::createMeshes() {
   names[3] = "paralelogram.obj";
   names[4] = "purple_triangle.obj";
   names[5] = "red_triangle.obj";
-  names[6] = "green_cube.obj";
+  names[6] = "cube.obj";  //I had to use this 
 
-  for (int i = 0; i < MESH_SIZE; i++) {
-	  mgl::Mesh *Mesh = new mgl::Mesh();
-	  Mesh->joinIdenticalVertices();
-	  Mesh->create(mesh_dir + names[i]);
-	  mesh_list[i] = Mesh;
+  Head = new struct Mesh_obj;
+  Tail = new struct Mesh_obj;
+  Head->Mesh = new mgl::Mesh();
+  Head->Mesh->joinIdenticalVertices();
+  Head->Mesh->create(mesh_dir + names[0]);
+  Tail = Head;
+
+  for (int i = 1; i < MESH_SIZE; i++) {
+
+	  struct Mesh_obj* obj = new struct Mesh_obj;
+	  obj->Mesh = new mgl::Mesh();
+	  obj->Mesh->joinIdenticalVertices();
+	  obj->Mesh->create(mesh_dir + names[i]);
+	  Tail->next_pointer = obj;
+	  Tail = obj;
   }
+
+
 
 }
 
@@ -131,19 +153,20 @@ void MyApp::createMeshes() {
 ///////////////////////////////////////////////////////////////////////// SHADER
 
 void MyApp::createShaderPrograms() {
-
+  
+  // CHNAGE HERE EVERY MESH HAS ITS ONW SHADER
   Shaders = new mgl::ShaderProgram();
   Shaders->addShader(GL_VERTEX_SHADER, "cube-vs.glsl");
   Shaders->addShader(GL_FRAGMENT_SHADER, "cube-fs.glsl");
 
   Shaders->addAttribute(mgl::POSITION_ATTRIBUTE, mgl::Mesh::POSITION);
-  if (mesh_list[0]->hasNormals()) {
+  if (Head->Mesh->hasNormals()) {
     Shaders->addAttribute(mgl::NORMAL_ATTRIBUTE, mgl::Mesh::NORMAL);
   }
-  if (mesh_list[0]->hasTexcoords()) {
+  if (Head->Mesh->hasTexcoords()) {
     Shaders->addAttribute(mgl::TEXCOORD_ATTRIBUTE, mgl::Mesh::TEXCOORD);
   }
-  if (mesh_list[0]->hasTangentsAndBitangents()) {
+  if (Head->Mesh->hasTangentsAndBitangents()) {
     Shaders->addAttribute(mgl::TANGENT_ATTRIBUTE, mgl::Mesh::TANGENT);
   }
 
@@ -269,8 +292,8 @@ void MyApp::drawScene() {
 void MyApp :: draw_meshs() {
 	Shaders->bind();
 	glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(ChangingModelMatrix));
-	for (mgl::Mesh* e : mesh_list) {
-		e->draw();
+	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
+		obj->Mesh->draw();
 	}
 	Shaders->unbind();
 }
@@ -430,8 +453,8 @@ void MyApp::displayCallback(GLFWwindow *win, double elapsed) {
 }
 
 void MyApp::windowCloseCallback(GLFWwindow* win) {
-	for (mgl::Mesh* e : mesh_list) {
-		e->destroyBufferObjects();
+	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
+		obj->Mesh->destroyBufferObjects();
 	}
 }
 
