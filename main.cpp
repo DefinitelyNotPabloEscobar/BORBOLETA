@@ -29,6 +29,8 @@
 
 #include <irrKlang.h>
 
+std::vector<glm::mat4> transformations;
+
 ////////////////////////////////////////////////////////////////////////// SOUND
 
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
@@ -124,6 +126,11 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////// MESHES
+
+void createTransformations() {
+	transformations.push_back(glm::rotate(glm::radians(135.f), glm::vec3(0.f, 0.f, 1.f))); //orange triangle
+
+}
 
 void MyApp::createMeshes() {
 
@@ -301,9 +308,11 @@ void MyApp::drawScene() {
 void MyApp::draw_meshs() {
 	Shaders->bind();
 	glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(ChangingModelMatrix));
+	int i = 0;
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
 		obj->Mesh->update_position(glm::rotate(glm::radians(angle), glm::vec3(1.f, 0.f, 0.f)));
 		obj->Mesh->draw();
+		i++;
 	}
 	Shaders->unbind();
 }
