@@ -126,7 +126,7 @@ void MyApp::createMeshes() {
   names[3] = "paralelogram.obj";
   names[4] = "purple_triangle.obj";
   names[5] = "red_triangle.obj";
-  names[6] = "cube.obj";  //I had to use this 
+  names[6] = "green_cube.obj";  //I had to use this 
 
   Head = new struct Mesh_obj;
   Tail = new struct Mesh_obj;
