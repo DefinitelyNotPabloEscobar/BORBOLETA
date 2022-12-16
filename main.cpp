@@ -29,7 +29,6 @@
 
 #include <irrKlang.h>
 
-std::vector<glm::mat4> transformations;
 
 ////////////////////////////////////////////////////////////////////////// SOUND
 
@@ -106,11 +105,12 @@ private:
 	struct Mesh_obj* Head;
 	struct Mesh_obj* Tail;
 
+	glm::mat4 transformations[MESH_SIZE];
+
 	//Movement var
 
 	float current_angle = 0.0f;
-	const float angle_sensitivity = 0.25f;
-	float angle = 0.f;
+	const float angle_sensitivity = 1.0f;
 	const float max_angle = 90.0f;
 	const float min_angle = 0.0f;
 
@@ -121,16 +121,12 @@ private:
 	void processMouseMovement(GLFWwindow* win);
 	void processKeyInput(GLFWwindow* win);
 	void draw_meshs();
+	void createTransformations();
 };
 
 
 
 ///////////////////////////////////////////////////////////////////////// MESHES
-
-void createTransformations() {
-	transformations.push_back(glm::rotate(glm::radians(135.f), glm::vec3(0.f, 0.f, 1.f))); //orange triangle
-
-}
 
 void MyApp::createMeshes() {
 
@@ -161,6 +157,8 @@ void MyApp::createMeshes() {
 		obj->Mesh->create(mesh_dir + names[i]);
 		Tail->next_pointer = obj;
 		Tail = obj;
+
+		transformations[i] = glm::mat4(1.0f);
 	}
 
 }
@@ -307,14 +305,79 @@ void MyApp::drawScene() {
 
 void MyApp::draw_meshs() {
 	Shaders->bind();
-	glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(ChangingModelMatrix));
 	int i = 0;
+	glm::mat4 M;
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
-		obj->Mesh->update_position(glm::rotate(glm::radians(angle), glm::vec3(1.f, 0.f, 0.f)));
-		obj->Mesh->draw();
+
+		switch (i){
+		case 0:
+			M = ChangingModelMatrix 
+				* glm::translate(glm::vec3((-0.63f * current_angle) / max_angle, (0.63f * current_angle) / max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle * -0.5f), glm::vec3(0.f, 1.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 1:
+			M = ChangingModelMatrix 
+				* glm::translate(glm::vec3(0, (-0.63f * current_angle) / max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle/2), glm::vec3(0.f, 1.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 2:
+			M = ChangingModelMatrix 
+				* glm::translate(glm::vec3((-0.63f*current_angle)/max_angle, (-0.63f*current_angle)/max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle* 0.5f), glm::vec3(0.f, 1.f, 0.f))
+				* glm::rotate(glm::radians(current_angle * 2.f), glm::vec3(0.f, 0.f, 1.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 3:
+			M = ChangingModelMatrix
+				* glm::translate(glm::vec3(((0.64f/2) * current_angle) / max_angle, ((-0.62f/2) * current_angle) / max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(0.f, 1.f, 0.f))
+				* glm::rotate(glm::radians(current_angle/2), glm::vec3(0.f, 1.f, 0.f))
+				* glm::rotate(glm::radians(current_angle*2), glm::vec3(1.f, 0.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 4:
+			M = ChangingModelMatrix 
+				* glm::translate(glm::vec3((0.645f * current_angle) / max_angle, (0.01f * current_angle) / max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(-current_angle * 0.5f), glm::vec3(0.f, 1.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 5:
+			M = ChangingModelMatrix 
+				* glm::translate(glm::vec3(0, (0.63f * current_angle) / max_angle, 0))
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle*1.5f), glm::vec3(0.f, 1.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		case 6:
+			M = ChangingModelMatrix 
+				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* glm::rotate(glm::radians(current_angle*1.5f), glm::vec3(0.f, 1.f, 0.f));
+			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
+			obj->Mesh->draw();
+			break;
+		default:
+			break;
+		}
 		i++;
 	}
 	Shaders->unbind();
+}
+
+void MyApp::createTransformations() {
+	//transformations.push_back(glm::rotate(glm::radians(135.f), glm::vec3(0.f, 1.f, 0.f))); //orange triangle
 }
 
 void MyApp::processKeyInput(GLFWwindow * win) {
@@ -353,22 +416,17 @@ void MyApp::processKeyInput(GLFWwindow * win) {
 	int state_left = glfwGetKey(win, GLFW_KEY_LEFT);
 	int state_right = glfwGetKey(win, GLFW_KEY_RIGHT);
 
-	angle = 0.0f;
 	if (state_left == GLFW_PRESS) {
 		current_angle += angle_sensitivity;
-		angle = angle_sensitivity;
 	}
 	if (state_right == GLFW_PRESS) {
 		current_angle -= angle_sensitivity;
-		angle = -angle_sensitivity;
 	}
 	if (current_angle >= max_angle) {
 		current_angle = max_angle;
-		angle = 0.0f;
 	}
 	if (current_angle <= min_angle) {
 		current_angle = min_angle;
-		angle = 0.0f;
 	}
 
 }
