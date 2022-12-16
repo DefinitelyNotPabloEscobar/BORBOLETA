@@ -3,6 +3,7 @@
 in vec3 inPosition;
 in vec2 inTexcoord;
 in vec3 inNormal;
+uniform vec3 Color;
 
 out vec3 exPosition;
 out vec2 exTexcoord;

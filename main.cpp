@@ -41,7 +41,7 @@ struct Mesh_obj
 	mgl::Mesh* Mesh = nullptr;
 	mgl::ShaderProgram* Shaders = nullptr;
 	Mesh_obj* next_pointer = nullptr;
-	Mesh_obj() : Mesh(nullptr), Shaders(nullptr), next_pointer(nullptr) {};
+	glm::vec3 color;
 
 } Mesh_obj;
 
@@ -105,8 +105,6 @@ private:
 	struct Mesh_obj* Head;
 	struct Mesh_obj* Tail;
 
-	glm::mat4 transformations[MESH_SIZE];
-
 	//Movement var
 
 	float current_angle = 0.0f;
@@ -121,7 +119,6 @@ private:
 	void processMouseMovement(GLFWwindow* win);
 	void processKeyInput(GLFWwindow* win);
 	void draw_meshs();
-	void createTransformations();
 };
 
 
@@ -133,6 +130,7 @@ void MyApp::createMeshes() {
 	std::string mesh_dir = "../assets/";
 
 	std::string names[MESH_SIZE];
+	glm::vec3 colors[MESH_SIZE];
 
 	names[0] = "blue_triangle.obj";
 	names[1] = "pink_triangle.obj";
@@ -142,11 +140,20 @@ void MyApp::createMeshes() {
 	names[5] = "red_triangle.obj";
 	names[6] = "green_cube.obj"; 
 
+	colors[0] = { 0.1f, 0.1f, 0.9f };
+	colors[1] = { 0.9f, 0.45f, 0.5f };
+	colors[2] = { 0.9f, 0.5f, 0.1f };
+	colors[3] = { 0.9f, 0.9f, 0.1f };
+	colors[4] = { 0.9f, 0.1f, 0.9f };
+	colors[5] = { 0.9f, 0.1f, 0.1f };
+	colors[6] = { 0.1f, 0.9f, 0.1f };
+
 	Head = new struct Mesh_obj;
 	Tail = new struct Mesh_obj;
 	Head->Mesh = new mgl::Mesh();
 	Head->Mesh->joinIdenticalVertices();
 	Head->Mesh->create(mesh_dir + names[0]);
+	Head->color = colors[0];
 	Tail = Head;
 
 	for (int i = 1; i < MESH_SIZE; i++) {
@@ -155,10 +162,9 @@ void MyApp::createMeshes() {
 		obj->Mesh = new mgl::Mesh();
 		obj->Mesh->joinIdenticalVertices();
 		obj->Mesh->create(mesh_dir + names[i]);
+		obj->color = colors[i];
 		Tail->next_pointer = obj;
 		Tail = obj;
-
-		transformations[i] = glm::mat4(1.0f);
 	}
 
 }
@@ -186,6 +192,7 @@ void MyApp::createShaderPrograms() {
 
 	Shaders->addUniform(mgl::MODEL_MATRIX);
 	Shaders->addUniformBlock(mgl::CAMERA_BLOCK, UBO_BP);
+	Shaders->addUniform("Color");
 	Shaders->create();
 
 	ModelMatrixId = Shaders->Uniforms[mgl::MODEL_MATRIX].index;
@@ -214,7 +221,7 @@ glm::mat4 ProjectionMatrix2 =
 glm::perspective(glm::radians(30.0f), 4.0f / 3.0f, 1.0f, 30.0f);
 
 void updateMatrices(float ratio) {
-	ProjectionMatrix1 = glm::ortho(-2.f * ratio, 2.f * ratio, -2.0f, 2.0f, 1.0f, 15.0f);
+	ProjectionMatrix1 = glm::ortho(-2.f * ratio, 2.f * ratio, -2.0f * ratio, 2.0f* ratio, 1.0f, 15.0f);
 	ProjectionMatrix2 = glm::perspective(glm::radians(30.0f), ratio, 1.0f, 30.0f);
 }
 
@@ -309,6 +316,8 @@ void MyApp::draw_meshs() {
 	glm::mat4 M;
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
 
+		glUniform3f(Shaders->Uniforms["Color"].index, obj->color.x, obj->color.y, obj->color.z);
+
 		switch (i){
 		case 0:
 			M = ChangingModelMatrix 
@@ -376,9 +385,6 @@ void MyApp::draw_meshs() {
 	Shaders->unbind();
 }
 
-void MyApp::createTransformations() {
-	//transformations.push_back(glm::rotate(glm::radians(135.f), glm::vec3(0.f, 1.f, 0.f))); //orange triangle
-}
 
 void MyApp::processKeyInput(GLFWwindow * win) {
 
