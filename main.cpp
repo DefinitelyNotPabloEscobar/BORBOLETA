@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// TODO : MUTIPLE SHADERS   SHADER LIST!!!
-
 #include <iostream>
 #include <iomanip>
 
@@ -314,65 +312,67 @@ void MyApp::draw_meshs() {
 	Shaders->bind();
 	int i = 0;
 	glm::mat4 M;
+	glm::mat4 rotationBetweenPlanes = glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f));
+
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
 
 		glUniform3f(Shaders->Uniforms["Color"].index, obj->color.x, obj->color.y, obj->color.z);
 
 		switch (i){
-		case 0:
+		case 0: //blue_triangle
 			M = ChangingModelMatrix 
 				* glm::translate(glm::vec3((-0.63f * current_angle) / max_angle, (0.63f * current_angle) / max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle * -0.5f), glm::vec3(0.f, 1.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 1:
+		case 1: //pink_triangle
 			M = ChangingModelMatrix 
 				* glm::translate(glm::vec3(0, (-0.63f * current_angle) / max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle/2), glm::vec3(0.f, 1.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 2:
+		case 2: //orange_triangle
 			M = ChangingModelMatrix 
 				* glm::translate(glm::vec3((-0.63f*current_angle)/max_angle, (-0.63f*current_angle)/max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle* 0.5f), glm::vec3(0.f, 1.f, 0.f))
 				* glm::rotate(glm::radians(current_angle * 2.f), glm::vec3(0.f, 0.f, 1.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 3:
+		case 3: //paralelogram
 			M = ChangingModelMatrix
 				* glm::translate(glm::vec3(((0.64f/2) * current_angle) / max_angle, ((-0.62f/2) * current_angle) / max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle), glm::vec3(0.f, 1.f, 0.f))
 				* glm::rotate(glm::radians(current_angle/2), glm::vec3(0.f, 1.f, 0.f))
 				* glm::rotate(glm::radians(current_angle*2), glm::vec3(1.f, 0.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 4:
+		case 4: //purple_triangle
 			M = ChangingModelMatrix 
 				* glm::translate(glm::vec3((0.645f * current_angle) / max_angle, (0.01f * current_angle) / max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(-current_angle * 0.5f), glm::vec3(0.f, 1.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 5:
+		case 5: //red triangle
 			M = ChangingModelMatrix 
 				* glm::translate(glm::vec3(0, (0.63f * current_angle) / max_angle, 0))
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle*1.5f), glm::vec3(0.f, 1.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
-		case 6:
+		case 6: //green_cube
 			M = ChangingModelMatrix 
-				* glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f))
+				* rotationBetweenPlanes
 				* glm::rotate(glm::radians(current_angle*1.5f), glm::vec3(0.f, 1.f, 0.f));
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
