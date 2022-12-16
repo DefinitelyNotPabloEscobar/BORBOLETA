@@ -106,9 +106,13 @@ private:
 	//Movement var
 
 	float current_angle = 0.0f;
+	float parametric_movement = 0.0f;
 	const float angle_sensitivity = 1.0f;
+	const float param_sensitivity = 0.011f;
 	const float max_angle = 90.0f;
+	const float max_param = 1.0f;
 	const float min_angle = 0.0f;
+	const float min_param = 0.0f;
 
 	void createMeshes();
 	void createShaderPrograms();
@@ -138,7 +142,7 @@ void MyApp::createMeshes() {
 	names[5] = "red_triangle.obj";
 	names[6] = "green_cube.obj"; 
 
-	colors[0] = { 0.1f, 0.1f, 0.9f };
+	colors[0] = { 0.1f, 0.9f, 0.9f };
 	colors[1] = { 0.9f, 0.45f, 0.5f };
 	colors[2] = { 0.9f, 0.5f, 0.1f };
 	colors[3] = { 0.9f, 0.9f, 0.1f };
@@ -312,18 +316,23 @@ void MyApp::draw_meshs() {
 	Shaders->bind();
 	int i = 0;
 	glm::mat4 M;
-	glm::mat4 rotationBetweenPlanes = glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f));
+	float rad = glm::radians(45.f);
+	//glm::mat4 rotationBetweenPlanes = glm::rotate(glm::radians(current_angle), glm::vec3(1.f, 0.f, 0.f));
+	glm::mat4 rotationBetweenPlanes = glm::rotate(glm::radians(parametric_movement*90.f), glm::vec3(1.f, 0.f, 0.f));
 
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
 
 		glUniform3f(Shaders->Uniforms["Color"].index, obj->color.x, obj->color.y, obj->color.z);
-
+		 
 		switch (i){
 		case 0: //blue_triangle
 			M = ChangingModelMatrix 
-				* glm::translate(glm::vec3((-0.63f * current_angle) / max_angle, (0.63f * current_angle) / max_angle, 0))
+				* glm::translate(glm::vec3((-0.9f * glm::cos(glm::radians(45.f)) * parametric_movement), (0.9f * glm::cos(glm::radians(45.f)) * parametric_movement) , 0))
 				* rotationBetweenPlanes
-				* glm::rotate(glm::radians(current_angle * -0.5f), glm::vec3(0.f, 1.f, 0.f));
+				* glm::rotate(glm::radians(parametric_movement * -45.f), glm::vec3(0.f, 1.f, 0.f));
+				//* glm::translate(glm::vec3((-0.63f * current_angle) / max_angle, (0.63f * current_angle) / max_angle, 0))
+				//* glm::rotate(glm::radians(current_angle * -0.5f), glm::vec3(0.f, 1.f, 0.f));
+
 			glUniformMatrix4fv(ModelMatrixId, 1, GL_FALSE, glm::value_ptr(M));
 			obj->Mesh->draw();
 			break;
@@ -425,14 +434,29 @@ void MyApp::processKeyInput(GLFWwindow * win) {
 	if (state_left == GLFW_PRESS) {
 		current_angle += angle_sensitivity;
 	}
+	if (state_left == GLFW_PRESS) {
+		parametric_movement += param_sensitivity;
+	}
+	//////////////////////////////////////////////
 	if (state_right == GLFW_PRESS) {
 		current_angle -= angle_sensitivity;
 	}
+	if (state_right == GLFW_PRESS) {
+		parametric_movement -= param_sensitivity;
+	}
+	//////////////////////////////////////////////
 	if (current_angle >= max_angle) {
 		current_angle = max_angle;
 	}
+	if (parametric_movement >= max_param) {
+		parametric_movement = max_param;
+	}
+	//////////////////////////////////////////////
 	if (current_angle <= min_angle) {
 		current_angle = min_angle;
+	}
+	if (parametric_movement <= min_param) {
+		parametric_movement = min_param;
 	}
 
 }
