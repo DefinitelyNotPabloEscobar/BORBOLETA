@@ -533,7 +533,7 @@ void MyApp::initCallback(GLFWwindow * win) {
 	createMeshes();
 	createShaderPrograms(); // after mesh;
 	createCamera();
-	//SoundEngine->play2D("../assets/surrender.mp3", true);
+	SoundEngine->play2D("../assets/surrender.mp3", true);
 
 }
 
