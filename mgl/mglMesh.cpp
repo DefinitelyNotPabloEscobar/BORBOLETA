@@ -186,18 +186,5 @@ void Mesh::draw() {
   glBindVertexArray(0);
 }
 
-/*
-void Mesh::update_position(glm::mat4 M) {
-	for (unsigned int i = 0; i < Positions.size(); i++) {
-		glm::vec4 v4 = { Positions[i].x, Positions[i].y, Positions[i].z, 1.f };
-		glm::vec4 vf = M * v4;
-		Positions[i] = vf;
-	}
-	destroyBufferObjects();
-	createBufferObjects();
-	
-}
-*/
-
 ////////////////////////////////////////////////////////////////////////////////
 } // namespace mgl

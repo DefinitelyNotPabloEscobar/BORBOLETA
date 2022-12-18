@@ -31,6 +31,7 @@
 ////////////////////////////////////////////////////////////////////////// SOUND
 
 irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+const float soundVolume = 0.3f;
 
 ////////////////////////////////////////////////////////////////////////// MYAPP
 
@@ -60,7 +61,7 @@ private:
 	glm::vec3 axis_z = { 0.0f, 0.0f, 1.0f };
 
 	// CAMERA1
-	glm::quat initial_postion_c1 = { 0.f, 0.317f, 0.167f, 11.308f };
+	glm::quat initial_postion_c1 = { 0.0f, 0.178f, 5.422f, 9.928f };
 	float alfa = 0.0f;
 	float beta = 0.0f;
 	int accelaration_x = 0;
@@ -70,7 +71,7 @@ private:
 	bool projection_camera1 = true;
 
 	// CAMERA2
-	glm::quat initial_position_c2 = { 0.0f, 0.178f, 5.422f, 9.928f };
+	glm::quat initial_position_c2 = { 0.f, 0.317f, 0.167f, 11.308f };
 	float alfa2 = 0.0f;
 	float beta2 = 0.0f;
 	int accelaration_x2 = 0;
@@ -373,11 +374,9 @@ void MyApp::processKeyInput(GLFWwindow * win) {
 	{
 		camera1_on = !camera1_on;
 		if (camera1_on) {
-			//Camera2 = nullptr;
 			Camera->Update(UBO_BP);
 		}
 		else {
-			//Camera = nullptr;
 			Camera2->Update(UBO_BP);
 		}
 	}
@@ -505,7 +504,7 @@ void MyApp::initCallback(GLFWwindow * win) {
 
 	/* SOUND!*/
 	SoundEngine->play2D("../assets/surrender.mp3", true);
-
+	SoundEngine->setSoundVolume(soundVolume);
 }
 
 void MyApp::windowSizeCallback(GLFWwindow * win, int winx, int winy) {
