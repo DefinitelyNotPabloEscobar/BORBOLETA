@@ -60,21 +60,21 @@ private:
 	glm::vec3 axis_z = { 0.0f, 0.0f, 1.0f };
 
 	// CAMERA1
+	glm::quat initial_postion_c1 = { 0.f, 0.317f, 0.167f, 11.308f };
 	float alfa = 0.0f;
 	float beta = 0.0f;
 	int accelaration_x = 0;
 	int accelaration_y = 0;
-	float r = 10.f;
 	float zoom = 2.f;
 	bool zooming = true;
 	bool projection_camera1 = true;
 
 	// CAMERA2
+	glm::quat initial_position_c2 = { 0.0f, 0.178f, 5.422f, 9.928f };
 	float alfa2 = 0.0f;
 	float beta2 = 0.0f;
 	int accelaration_x2 = 0;
 	int accelaration_y2 = 0;
-	float r2 = 10.f;
 	float zoom2 = 2.f;
 	bool projection_camera2 = true;
 
@@ -98,6 +98,16 @@ private:
 	mgl::Camera* Camera2 = nullptr;
 	GLint ModelMatrixId;
 
+	//Camera Types
+
+	// Orthographic LeftRight(-2,2) BottomTop(-2,2) NearFar(1,10)
+	glm::mat4 ProjectionMatrix1 =
+		glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 1.0f, 15.0f);
+
+	// Perspective Fovy(30) Aspect(640/480) NearZ(1) FarZ(30)
+	glm::mat4 ProjectionMatrix2 =
+		glm::perspective(glm::radians(30.0f), 4.0f / 3.0f, 1.0f, 30.0f);
+
 	static const int MESH_SIZE = 7;
 
 	struct Mesh_obj* Head;
@@ -116,6 +126,7 @@ private:
 	void processMouseMovement(GLFWwindow* win);
 	void processKeyInput(GLFWwindow* win);
 	void draw_meshs();
+	void updateMatrices(float ratio);
 };
 
 
@@ -199,25 +210,8 @@ void MyApp::createShaderPrograms() {
 
 glm::mat4 ModelMatrix(1.0f);
 
-// Eye(5,5,5) Center(0,0,0) Up(0,1,0)
-const glm::mat4 ViewMatrix1 =
-glm::lookAt(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, 1.0f, 0.0f));
 
-// Eye(-5,-5,-5) Center(0,0,0) Up(0,1,0)
-const glm::mat4 ViewMatrix2 =
-glm::lookAt(glm::vec3(-5.0f, -5.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, 1.0f, 0.0f));
-
-// Orthographic LeftRight(-2,2) BottomTop(-2,2) NearFar(1,10)
-glm::mat4 ProjectionMatrix1 =
-glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 1.0f, 15.0f);
-
-// Perspective Fovy(30) Aspect(640/480) NearZ(1) FarZ(30)
-glm::mat4 ProjectionMatrix2 =
-glm::perspective(glm::radians(30.0f), 4.0f / 3.0f, 1.0f, 30.0f);
-
-void updateMatrices(float ratio) {
+void MyApp::updateMatrices(float ratio) {
 	ProjectionMatrix1 = glm::ortho(-2.f * ratio, 2.f * ratio, -2.0f * ratio, 2.0f* ratio, 1.0f, 15.0f);
 	ProjectionMatrix2 = glm::perspective(glm::radians(30.0f), ratio, 1.0f, 30.0f);
 }
@@ -226,7 +220,9 @@ void MyApp::createCamera() {
 
 	Camera2 = new mgl::Camera(UBO_BP);
 	Camera = new mgl::Camera(UBO_BP);
-	Camera->setViewMatrix(ViewMatrix1);
+	Camera->setViewMatrix(glm::lookAt({ initial_postion_c1.x,initial_postion_c1.y,initial_postion_c1.z },
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f)));
 	Camera->setProjectionMatrix(ProjectionMatrix2);
 
 }
@@ -239,29 +235,14 @@ void MyApp::drawScene() {
 
 	if (camera1_on) {
 
-		/*
-		float x = r * glm::cos(glm::radians(alfa)) * glm::sin(glm::radians(beta));
-		float z = r * glm::sin(glm::radians(alfa)) * glm::sin(glm::radians(beta));
-		float y = r * glm::cos(glm::radians(beta));
-		*/
-
-		glm::vec4 q_vec = { 7.0f, 7.0f, 7.0f, 0.0f };
-		glm::quat q_quart = { 0.f, 7.0f, 7.0f, 7.0f };
 		glm::quat qy = glm::angleAxis(glm::radians(-alfa), axis_y);
 		glm::quat qx = glm::angleAxis(glm::radians(beta), axis_x);
-		glm::quat qtotal = qy * qx;
-		glm::quat q1 = qx * q_quart * glm::inverse(qx);
+		glm::quat q1 = qx * initial_postion_c1 * glm::inverse(qx);
 		glm::quat q2 = qy * q1 * glm::inverse(qy);
-		glm::vec4 vf4 = glm::rotate(qtotal, q_vec);
-		//std::cout << " vf4 =" << glm::to_string(vf4) << std::endl;
-		//std::cout << " q2 =" << glm::to_string(q2) << std::endl;
-		glm::vec3 vf3 = { vf4.x, vf4.y, vf4.z };
-		glm::vec3 vf3_a = { q2.x, q2.y, q2.z };
-		//std::cout << " vf3 =" << glm::to_string(vf3) << std::endl;
-		//std::cout << " vf3_a =" << glm::to_string(vf3_a) << std::endl;
+		glm::vec3 vf = { q2.x, q2.y, q2.z };
 
 		const glm::mat4 ChangingViewMatrix =
-			glm::lookAt(vf3_a, glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::lookAt(vf, glm::vec3(0.0f, 0.0f, 0.0f),
 				glm::vec3(0.0f, 1.0f, 0.0f));
 
 		Camera->setViewMatrix(ChangingViewMatrix * glm::scale(glm::vec3(1.0f * zoom)));
@@ -273,27 +254,14 @@ void MyApp::drawScene() {
 	}
 	else {
 
-		/*
-		float x = r2 * glm::cos(glm::radians(alfa2)) * glm::sin(glm::radians(beta2));
-		float z = r2 * glm::sin(glm::radians(alfa2)) * glm::sin(glm::radians(beta2));
-		float y = r2 * glm::cos(glm::radians(beta2));
-		*/
-
-		glm::vec4 q_vec = { 10.0f, 10.0f, 10.0f, 0.0f };
-		glm::quat q_quart = { 0.f, 10.0f, 10.0f, 10.0f };
 		glm::quat qy = glm::angleAxis(glm::radians(-alfa2), axis_y);
 		glm::quat qx = glm::angleAxis(glm::radians(beta2), axis_x);
-		glm::quat qtotal = qy * qx;
-		glm::quat q1 = qx * q_quart * glm::inverse(qx);
+		glm::quat q1 = qx * initial_position_c2 * glm::inverse(qx);
 		glm::quat q2 = qy * q1 * glm::inverse(qy);
-		glm::vec4 vf4 = glm::rotate(qtotal, q_vec);
-		glm::vec3 vf3 = { vf4.x, vf4.y, vf4.z };
-		glm::vec3 vf3_a = { q2.x, q2.y, q2.z };
-		std::cout << " vf3 =" << glm::to_string(vf3) << std::endl;
-		std::cout << " vf3_a =" << glm::to_string(vf3_a) << std::endl;
+		glm::vec3 vf = { q2.x, q2.y, q2.z };
 
 		const glm::mat4 ChangingViewMatrix =
-			glm::lookAt(vf3_a, glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::lookAt(vf, glm::vec3(0.0f, 0.0f, 0.0f),
 				glm::vec3(0.0f, 1.0f, 0.0f));
 
 		Camera2->setViewMatrix(ChangingViewMatrix * glm::scale(glm::vec3(1.0f * zoom2)));
@@ -312,7 +280,7 @@ void MyApp::draw_meshs() {
 	int i = 0;
 	glm::mat4 M;
 	glm::mat4 rotationBetweenPlanes = glm::rotate(glm::radians(parametric_movement*90.f), glm::vec3(1.f, 0.f, 0.f));
-
+	
 	for (struct Mesh_obj* obj = Head; obj != nullptr; obj = obj->next_pointer) {
 
 		glUniform3f(Shaders->Uniforms["Color"].index, obj->color.x, obj->color.y, obj->color.z);
@@ -459,9 +427,10 @@ void MyApp::processMouseMovement(GLFWwindow * win) {
 			double diffx = xpos - old_xpos;
 			double diffy = ypos - old_ypos;
 
-			alfa += (float)diffx * 0.1;
+			alfa += (float)diffx * 0.1f;
 			accelaration_x += (int)diffx;
-			beta -= (float)diffy * 0.1;
+
+			beta -= (float)diffy * 0.1f;
 			accelaration_y -= (int)diffy;
 		}
 		// So we dont overflow it
@@ -474,8 +443,8 @@ void MyApp::processMouseMovement(GLFWwindow * win) {
 		old_xpos = xpos;
 		old_ypos = ypos;
 
-		alfa += (float)accelaration_x / 10;
-		beta += (float)accelaration_y / 10;
+		alfa += (float)accelaration_x/10;
+		beta += (float)accelaration_y/10;
 
 		if (accelaration_x > 0)
 			accelaration_x -= 1;
@@ -496,9 +465,9 @@ void MyApp::processMouseMovement(GLFWwindow * win) {
 			double diffx = xpos - old_xpos;
 			double diffy = ypos - old_ypos;
 
-			alfa2 += (float)diffx * 0.1;
+			alfa2 += (float)diffx * 0.1f;
 			accelaration_x2 += (int)diffx;
-			beta2 -= (float)diffy * 0.1;
+			beta2 -= (float)diffy * 0.1f;
 			accelaration_y2 -= (int)diffy;
 		}
 		// So we dont overflow it
@@ -511,8 +480,8 @@ void MyApp::processMouseMovement(GLFWwindow * win) {
 		old_xpos = xpos;
 		old_ypos = ypos;
 
-		alfa2 += (float)accelaration_x2 / 10;
-		beta2 += (float)accelaration_y2 / 10;
+		alfa2 += (float)accelaration_x2/10;
+		beta2 += (float)accelaration_y2/10;
 
 		if (accelaration_x2 > 0)
 			accelaration_x2 -= 1;
@@ -533,7 +502,9 @@ void MyApp::initCallback(GLFWwindow * win) {
 	createMeshes();
 	createShaderPrograms(); // after mesh;
 	createCamera();
-	SoundEngine->play2D("../assets/surrender.mp3", true);
+
+	/* SOUND!*/
+	//SoundEngine->play2D("../assets/surrender.mp3", true);
 
 }
 
