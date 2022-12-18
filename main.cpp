@@ -504,7 +504,7 @@ void MyApp::initCallback(GLFWwindow * win) {
 	createCamera();
 
 	/* SOUND!*/
-	//SoundEngine->play2D("../assets/surrender.mp3", true);
+	SoundEngine->play2D("../assets/surrender.mp3", true);
 
 }
 
